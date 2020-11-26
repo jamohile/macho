@@ -41,6 +41,10 @@ describe("Macho, high level", () => {
     expect(m.hasData()).toBe(true);
   });
 
+  it("can set initial data", () => {
+    const m = new Macho<any>({initial: "foo"});
+    expect(m.lastData()).toBe("foo");
+  })
 
   it("handles longer subscription", (done) => {
     let times = 0;
