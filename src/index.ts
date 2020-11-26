@@ -3,6 +3,7 @@ import { MachoSubscriptionManager } from "./MachoSubscriptionManager";
 import { MachoWorker, MachoWorkerManager, MachoWorkerProps } from "./MachoWorkerManager";
 
 export type Unsubscriber = (() => void) | void;
+export type MachoUnsubscriber = () => void;
 export type Setter<T> = (value: T) => void;
 export type MachoListener<T> = (val: T) => void;
 
@@ -20,13 +21,13 @@ export class Macho<T> {
   worker: MachoWorkerManager<T>;
   subscriptions: MachoSubscriptionManager<T>;
 
-  constructor(props: MachoProps<T>) {
+  constructor(props: MachoProps<T> = {}) {
     this.worker = new MachoWorkerManager(this, props.worker || (() => {}), props);
     this.dependencies = new MachoDependencyManager(this, props.dependencies || []);
     this.subscriptions = new MachoSubscriptionManager(this);
   }
 
-  subscribe(listener: MachoListener<T>): Unsubscriber {
+  subscribe(listener: MachoListener<T>): MachoUnsubscriber {
     const unsubscriber = this.subscriptions.add(listener);
     this.worker.scale();
     return unsubscriber;

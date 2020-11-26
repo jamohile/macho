@@ -32,7 +32,7 @@ export class MachoWorkerManager<T> {
 
   scale() {
     const isEmpty = this.macho.subscriptions.size() == 0;
-    const isRunning = this.unsubscriber !== undefined;
+    const isRunning = this.state === MachoWorkerStates.RUNNING;
 
     if (isEmpty && isRunning && !this.props.persist) {
       this.scheduleStop(true);
@@ -44,33 +44,42 @@ export class MachoWorkerManager<T> {
 
   scheduleStop(hard: boolean = true) {
     this.cancelStop();
+    //@ts-ignore
     this.scheduledStop = setTimeout(() => this.stop(hard), this.props.delayShutdown || 0);
     this.state = MachoWorkerStates.PENDING_STOP;
   }
 
+  // Returns true if it actually did cancel.
   cancelStop() {
     if (this.scheduledStop) {
       clearTimeout(this.scheduledStop);
       this.scheduledStop = undefined;
+      this.state = MachoWorkerStates.RUNNING;
+      return true;
     }
-    this.state = this.unsubscriber ? MachoWorkerStates.RUNNING : MachoWorkerStates.STOPPED;
+    return false;
   }
 
   stop(hard: boolean) {
+    if (hard) {
+      this.macho.dependencies.unsubscribeAll();
+    }
     if (this.unsubscriber) {
       this.unsubscriber();
       this.unsubscriber = undefined;
     }
     this.state = MachoWorkerStates.STOPPED;
-    if (hard)
-      this.macho.dependencies.unsubscribeAll();
   }
 
   start(hard: boolean) {
-    this.cancelStop();
-    this.unsubscriber = this.worker(data => this.macho.set(data));
-    if (hard)
+    const didCancel = this.cancelStop();
+    if (didCancel) {
+      return;
+    }
+    if (hard) {
       this.macho.dependencies.subscribeAll();
+    }
+    this.unsubscriber = this.worker(data => this.macho.set(data));
     this.state = MachoWorkerStates.RUNNING;
   }
 
