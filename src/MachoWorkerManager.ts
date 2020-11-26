@@ -28,6 +28,9 @@ export class MachoWorkerManager<T> {
     this.macho = macho;
     this.worker = worker;
     this.props = props.workerProps || {};
+    if (this.props.persist) {
+      this.scale();
+    }
   }
 
   scale() {

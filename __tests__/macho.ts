@@ -23,6 +23,27 @@ describe("Macho, high level", () => {
     m.set("foo");
     expect(m.lastData()).toBe("foo");
   });
+
+  it("handles longer subscription", (done) => {
+    let times = 0;
+    const m = new Macho<any>({
+      worker: set => {
+        const handle = setInterval(() => {
+          times += 1;
+          set(times);
+        }, 50);
+        return () => clearInterval(handle);
+      },
+      workerProps: {persist: true}
+    });
+    setTimeout(() => {
+      m.worker.stop(true);
+      for (let i = 1; i <= times; i += 1) {
+        expect(m.set).toHaveBeenNthCalledWith(i, i)
+      }
+      done();
+    }, 1000);
+  })
 });
 
 describe("Macho, dependency bubbling", () => {

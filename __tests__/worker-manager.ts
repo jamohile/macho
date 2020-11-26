@@ -34,6 +34,13 @@ describe("MachoWorkerManager", () => {
     expect(machoMock.dependencies.subscribeAll).toHaveBeenCalled();
   });
 
+  it("automatically starts if persist is true", () => {
+    const wm = new MachoWorkerManager(machoMock, set => set({}), {
+      workerProps: {persist: true}
+    });
+    expect(wm.macho.set).toHaveBeenCalledTimes(1);
+  });
+
   it("can be stopped", () => {
     const stopSpy = jest.fn();
     const wm = new MachoWorkerManager(machoMock, () => stopSpy, {});

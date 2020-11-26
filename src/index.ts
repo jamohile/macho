@@ -22,9 +22,9 @@ export class Macho<T> {
   subscriptions: MachoSubscriptionManager<T>;
 
   constructor(props: MachoProps<T> = {}) {
-    this.worker = new MachoWorkerManager(this, props.worker || (() => {}), props);
     this.dependencies = new MachoDependencyManager(this, props.dependencies || []);
     this.subscriptions = new MachoSubscriptionManager(this);
+    this.worker = new MachoWorkerManager(this, props.worker || (() => {}), props);
   }
 
   subscribe(listener: MachoListener<T>): MachoUnsubscriber {
