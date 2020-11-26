@@ -5,7 +5,9 @@ describe("MachoSubscriptionManager", () => {
   let machoMock: Macho<any>;
   
   beforeEach(() => {
-    machoMock = {} as Macho<any>;
+    machoMock = {
+      lastData: jest.fn(),
+    } as unknown as Macho<any>;
   })
 
   it("can instantiate", () => {

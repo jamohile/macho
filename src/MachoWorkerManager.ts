@@ -24,7 +24,7 @@ export class MachoWorkerManager<T> {
   unsubscriber?: Unsubscriber;
   scheduledStop?: number;
 
-  constructor(macho: Macho<T>, worker: MachoWorker<T>, props: MachoProps<T>) {
+  constructor(macho: Macho<T>, worker: MachoWorker<T> = () => {}, props: MachoProps<T>) {
     this.macho = macho;
     this.worker = worker;
     this.props = props.workerProps || {};

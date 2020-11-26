@@ -1,5 +1,5 @@
 import { MachoDependencyManager } from "./MachoDependencyManager";
-import { MachoSubscriptionManager } from "./MachoSubscriptionManager";
+import { MachoSubscriptionManager, MachoSubscriptionProps } from "./MachoSubscriptionManager";
 import { MachoWorker, MachoWorkerManager, MachoWorkerProps } from "./MachoWorkerManager";
 
 export type Unsubscriber = (() => void) | void;
@@ -11,8 +11,10 @@ export type MachoListener<T> = (val: T) => void;
 export interface MachoProps<T> {
   worker?: MachoWorker<T>;
   dependencies?: Macho<any>[];
+  initial?:T;
   
   workerProps?: MachoWorkerProps;
+  subscriptionProps?: MachoSubscriptionProps;
 }
 export class Macho<T> {
   data: T | undefined;
@@ -23,8 +25,9 @@ export class Macho<T> {
 
   constructor(props: MachoProps<T> = {}) {
     this.dependencies = new MachoDependencyManager(this, props.dependencies || []);
-    this.subscriptions = new MachoSubscriptionManager(this);
-    this.worker = new MachoWorkerManager(this, props.worker || (() => {}), props);
+    this.subscriptions = new MachoSubscriptionManager(this, props.subscriptionProps);
+    this.worker = new MachoWorkerManager(this, props.worker, props);
+    this.data = props.initial;
   }
 
   subscribe(listener: MachoListener<T>): MachoUnsubscriber {
@@ -45,6 +48,14 @@ export class Macho<T> {
   set(val: T) {
     this.data = val;
     this.subscriptions.notify(this.data);
+  }
+
+  update(handler: (data: T) => T) {
+    this.set(handler(this.lastData() as T));
+  }
+
+  hasData(): boolean {
+    return this.lastData() !== undefined;
   }
 }
 

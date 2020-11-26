@@ -24,6 +24,24 @@ describe("Macho, high level", () => {
     expect(m.lastData()).toBe("foo");
   });
 
+  it("can update", () => {
+    const m = new Macho<any>({});
+    m.set("foo");
+    m.update(data => {
+      expect(data).toBe("foo")
+      return data.toUpperCase();
+    })
+    expect(m.lastData()).toBe("FOO");
+  });
+
+  it("can tell if data exists", () => {
+    const m = new Macho<any>({});
+    expect(m.hasData()).toBe(false);
+    m.set("foo");
+    expect(m.hasData()).toBe(true);
+  });
+
+
   it("handles longer subscription", (done) => {
     let times = 0;
     const m = new Macho<any>({

@@ -2,12 +2,18 @@ import { MachoListener, Macho } from "./index";
 
 type MachoUnsubscriber = () => void;
 
+export interface MachoSubscriptionProps {
+  disableWelcomeNotify?: boolean
+}
+
 export class MachoSubscriptionManager<T> {
   subscriptions = new Map<number, MachoListener<T>>();
   macho: Macho<T>;
+  props: MachoSubscriptionProps;
 
-  constructor(macho: Macho<T>) {
+  constructor(macho: Macho<T>, props: MachoSubscriptionProps = {}) {
     this.macho = macho;
+    this.props = props;
   }
 
   add(listener: MachoListener<T>): MachoUnsubscriber {
@@ -17,6 +23,9 @@ export class MachoSubscriptionManager<T> {
         continue;
       }
       this.subscriptions.set(id, listener);
+      if (!this.props.disableWelcomeNotify) {
+        listener(this.macho.lastData() as T);
+      }
       return () => this.remove(id);
     }
     throw new Error("Could not generate an ID for macho.")
