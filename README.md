@@ -1,4 +1,6 @@
-# Macho
+![logo](https://user-images.githubusercontent.com/17712692/100533843-e46c5780-31d6-11eb-99db-1ae735e46ce9.png)
+
+#Macho
 State that doesn't suck.
 
 ## What is Macho?
